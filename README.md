@@ -121,7 +121,7 @@ Channel : Time : Slice : X : Y
 For any other type of data, the dimensions can be reshaped to fit this structure (i.e., unnecessary dimensions can be set to have a shape of `1`).
 
 **Note:**
-In [this research](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/), the UK Biobank MRI ZIP files were processed using the script available at [https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS/blob/master/preprocess/createMRH5.py](https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS/blob/master/preprocess/createMRH5.py) to create the corresponding HDF5 file.
+In [this research](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/), the UK Biobank MRI ZIP files were processed using the script available at [https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS/blob/master/preprocess/createH5s/createH5_MR_DICOM.py](https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS/blob/master/preprocess/createH5s/createH5_MR_DICOM.py) to create the corresponding HDF5 file.
 
 ## Trained Weights from Hugging Face
 The 3D DiffAE models trained on the CINE Cardiac Long Axis MRIs from UK Biobank as part of the research [Unsupervised cardiac MRI phenotyping with 3D diffusion autoencoders reveals novel genetic insights](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/) are available on [Hugging Face](https://huggingface.co/collections/soumickmj/cardiacdiffae-gwas-671b7595d09b0746b8fd0b72). 
