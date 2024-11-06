@@ -1,32 +1,62 @@
-# UKBBLatent: Unsupervised phenotyping and genetic discovery in 71,021 cardiac MRIs
+# Unsupervised latent representation learning using 2D and 3D diffusion and other autoencoders
 
-The official code for the paper "Unsupervised phenotyping and genetic discovery in 71,021 cardiac MRIs" (https://arxiv.org/abs/XXXX.XXXX).
+This repository provides a pipeline for training and evaluating 2D and 3D diffusion autoencoders, traditional autoencoders, and various variational autoencoders for unsupervised latent representation learning from 2D and 3D images, primarily focusing on MRIs. This repository was developed as part of the paper titled [Unsupervised cardiac MRI phenotyping with 3D diffusion autoencders reveals novel genetic insights](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/) and was utilised to learn and infer latent representations from cardiac MRIs (CINE) using a 3D diffusion autoencoder.
+
+  - [Pipeline](#pipeline)
+    - [Structure](#structure)
+    - [Executing the pipeline](#executing-the-pipeline)
+      - [Running inference on a trained model](#running-inference-on-a-trained-model)
+  - [Dataset](#dataset)
+    - [Data Dimensions](#data-dimensions)
+  - [Trained Weights from Hugging Face](#weights-from-hugging-face)
+  - [Citation](#citation)
+  - [Credits](#credits)
+    - [DiffAE: Diffusion Autoencoder](#diffae-diffusion-autoencoder)
+    - [pythae: Unifying Generative Autoencoders in Python](#pythae-unifying-generative-autoencoders-in-python)
+
 
 ## Pipeline 
-This pipeline is based on the NCC1701 pipeline (of Soumick): https://github.com/soumickmj/NCC1701 from the paper: https://doi.org/10.1016/j.compbiomed.2022.105321
-Special thanks to Domenico Iuso for working together with me (Soumick) on improving the NCC1701 with the latest features, including DeepSpeed!
 
-### pythae
-A really nice package, a benchmarking platform, for training autoencoders (mainly VAEs). This package has been integrated into our pipeline. 
-To use models from this package, you would need to supply 0 as the modelID, model name (from the list: Engineering/Engines/WarpDrives/pythaeDrive/__init__.py) as pythae_model, and the relative path (from the Engineering/Engines/WarpDrives/pythaeDrive/configs) to the config JSON file for pythae as pythae_config (optional, if blank, default one will be used). For example, for the Factor VAE's config file meant for the celeba dataset, "originals/celeba/factor_vae_config.json" must be supplied (defaults can also be found inside the same _init__.py file). The init file must be updated when a new model is added to the package, or we have introduced a new one. The original config files (including the whole package) are meant for a few "toy" image datasets (binary_mnist, celeba, cifar10, dsprites, and mnist). As celeba is the most complex one among them, we are choosing those configs as defaults. But we might need to modify them for our tasks.
+### Structure
+**Inside the _Executors_ package**, you will find the actual execution scripts. For different problems, the relevant *main* files can be placed here. Sub-packages may also be created within this package to better organise different experiments.
 
-### Engaging (i.e. Executing) the pipeline 
-Inside the _Bridge_ package, there are the actual execution scripts. For different problems, we can put the _main_ files here. We can have different sub-packages here to organise the different experiments better.
-_main*.py_ : is the actual main file that is to be used to engage the pipeline. (_prova*_ file is similar to the main one but to be used for debugging purposes on a dummy dataset). This file contains all the default values for different command line arguments - these can be supplied while calling this script.
+- **_main*.py_:** This is the main script used to run the pipeline. It contains all the default values for various command-line arguments, which can be supplied when invoking this script.  
 
-Inside the _Cargo_ folder, there are the two types files required by the _main_ file. Sub-folder structures can be created for organising the different experiments better.
-_config*.yaml_: The configurations, more specific ones to the different aspects of the pipeline (e.g. LR scheduler parameters), which won't be modified on a regular basis, are kept here in this file - in a hierarchical fashion. These values can also be overridden using command line arguments, discussed later.
-_dataNpath*.json_: As the name suggests, this file contains dataset-specific parameters, including the name of the foldCSV, run_prefix, etc., as well as the required paths - data directory (where the data.h5, supplied .csv file for the folds can be found - and also where the processed dataset files will be stored). 
+Currently, three distinct main files are available:  
+1. `main_recon.py`: For 2D and 3D autoencoders (including VAEs but excluding diffusion autoencoders).  
+2. `main_diffAE.py`: For 2D and 3D diffusion autoencoders.  
+3. `main_latentcls.py`: For training a classifier on the latent space.  
 
-To engage, the call should be from the root directly of the pipeline. For example:
+**Inside the *Configs* folder,** there are two types of files required by the *main* scripts. Sub-folder structures can be created within this folder to better organise different experiments.  
+
+- **_config*.yaml_:** These files contain configuration parameters, typically specific to different aspects of the pipeline (e.g., learning rate scheduler parameters). As these parameters are less likely to change frequently, they are defined here in a hierarchical format. However, these values can also be overridden using command-line arguments, which will be discussed later.  
+- **_dataNpath*.json_:** As the name suggests, these files include dataset-specific parameters, such as the name of the foldCSV file and the run prefix. They also define necessary paths, such as the data directory (where the `data.h5` file, the supplied CSV for folds, and the processed dataset files are stored).
+
+**Inside the *Engineering* package,** all the files related to the actual implementation of the pipeline are stored. 
+
+
+### Executing the pipeline
+
+A conda environment can be created using the provided `environment.yml` file. 
+
+To execute, the call should be from the root directly of the pipeline. For example:
 ```python
-    python Bridge/main_recon.py --batch_size 32 --lr 0.0001 --training§LRDecay§type1§decay_rate 0.15 --training§prova testing --json§save_path /myres/toysets/Results
+    python Executors/main_recon.py --batch_size 32 --lr 0.0001 --training§LRDecay§type1§decay_rate 0.15 --training§prova testing --json§save_path /myres/toysets/Results
 ```
 Here, _main_recon.py_ is the main file that is to be executed, _batch_size_ and _lr_ are arguments which will be replacing the default values for those parameters supplied within that main file, _training§LRDecay§type1§decay_rate_ and _training§prova_ (arguments not specified inside the main file or any of the Engines) are going to override the values present inside the config.yaml file mentioned inside the main file (or supplied as a command line argument) - following the path splitting the key with dollars, and finally, _json§save_path_ (same as the earlier one, but arguments starting with _json§_) will override the _save_path_ value of the parameter inside the _dataNpath.json_ specified inside the main file (or supplied as a command line argument).
-Notes:  
+
+Please note:  
 _training§LRDecay§type1§decay_rate_ will try to find the dictonary path _training/LRDecay/type1/decay_rate_ inside the yaml file. If the path is found, the value will be updated (for the current run only) with the supplied one. If it's not found, like in this example training§prova, a new path will be created, and the value will be added (for the current run only). Any command line argument that is not found inside the main file, or any of the Engines or Warp Drives, will be treated as an "unknown" parameter and will be treated in this manner - unless they start with "_json§". In that case, it is used to update the value of _save_path_ present inside the _dataNpath.json_ for the current run. 
 
-#### Running inference of a trained model
+
+For complete list of command line arguments, please refer to the main files or execute the main file with the `--help` flag. For example:
+```python
+    python Executors/main_diffAE.py --help
+```
+and check the files inside *Configs* folder.
+
+
+#### Running inference on a trained model
 Add the following command line arguments to the ones used during training:
 ```python
     --resume --load_best --run_mode 2
@@ -43,82 +73,117 @@ To run inference on the whole dataset (ignoring the splits), add the following:
 (can also change fullDS to something else)
 
 ## Dataset 
-The original dataset is first processed using https://gitlab.fht.org/glastonburygroup/tricorder/-/blob/main/preprocess/createMRH5.py to create the corresponding HDF5 file.
+This pipeline expects an HDF5 file containing the dataset as input, following the structure described below.
 
-Structure of the HDF5:
-Groups with the path 
+The groups should follow the path:
 ```python
-    patientID/fieldID/instanceID
+patientID/fieldID/instanceID
 ```
-Groups have the following attributes: DICOM Patient ID, DICOM Study ID, description of the study, AET (not sure what it means, but it seems to have the model of the scanner), 
-Host (some ID, not sure!!), date of the study, number of series in the study:
+Groups may (optionally) include the following attributes: DICOM Patient ID, DICOM Study ID, description of the study, AET (model of the scanner), Host, date of the study, number of series in the study:
 ```python
     patientDICOMID, studyDICOMID, studyDesc, aet, host, date, n_series
 ```
-Inside each group, each series present is stored as a different dataset (except if it is specified in the https://gitlab.fht.org/glastonburygroup/tricorder/-/blob/main/preprocess/createH5s/meta.yaml to stack some dim). The key for the datasets can be:
+Each series present is stored as a separate dataset, and the key for the datasets can be:
 
-**primary**: to store the primary data (i.e. the series description matches with one of the values of the primary_data attribute).
+- **`primary`:** To store the primary data (i.e., the series description matches one of the values of the `primary_data` attribute).
+- **`primary_*`:** (Optional) If the `multi_primary` attribute is set to `True`, then instead of a single `primary` key, there will be multiple keys in the form `primary_*`, where `*` is replaced by the corresponding tag supplied using the `primary_data_tags` attribute.
+- **`auxiliary_*`:** (Optional) To store auxiliary data (e.g., T1 maps in the case of ShMoLLI). Here, `*` is replaced by the corresponding tag supplied using the `auxiliary_data_tags` attribute.
 
-**primary_***: (optional) In case the multi_primary attribute is set to True, then inside of just "primary", there will be multiple "primary_*", where "*" will be replaced by the corresponding tag supplied using the primary_data_tags attribute.
+Additional type information may be appended to the dataset key:
 
-**auxiliary_***: (optional) to store auxiliary data [e.g. T1 maps in case of ShMoLLI] (i.e. the series description matches with one of the values of the auxiliary_data attribute). "*" will be replaced by the corresponding tag supplied using the auxiliary_data_tags attribute.
+1. **`_sagittal`, `_coronal`, or `_transverse`:**  
+   If the `default_plane` attribute is not present, or the acquisition plane (determined using the DICOM header tag `0020|0037`) of the series differs from the value specified in the `default_plane` attribute, the plane is appended to the key.
 
-Additionally, some additional type info might be added to the key.
+2. **`_0` to `_n`:**  
+   If the `repeat_acq` attribute is set to `True`, "_0" is appended to the first acquisition with the key created following the above rules. Subsequent acquisitions with the same key will have suffixes like `_1`, `_2`, ..., `_n`. If `repeat_acq` is set to `False` (or not supplied), "_0" is not appended, and any repeated occurrence of the same key is ignored (after logging an error).
 
-**_sagittal** or **_coronal** or **_transverse**: If the default_plane attribute is not present or the acquisition plane (computed using the DICOM header tag 0020|0037) of the series is different from the one specified in the default_plane attribute, then the plane will be concatenated with the key.
+**The value of each dataset must be the data itself.**
 
-**_0** to **_n**: If the repeat_acq attribute is set to True, then "_0" will be concatenated with the first acquisition with the already created key (following the rules mentioned so far). The subsequent acquisitions with the same key will have suffixes like "_1, _2,...,_n". If repeat_acq is set to False (or not supplied), then "_0" won't be concatenated, and any repeat occurrence of the same key will be ignored (i.e. the series will be ignored after logging an error). 
-
-[Note: all the mentioned attributes mentioned in this section refer to the attributes present inside the previously-mentioned meta.yaml file]
-
-The value of the dataset is the data itself.
-
-Each dataset additionally contains five attributes - series ID, DICOM header (ignoring Siemens' CSA header - tags starting with 0029 - as they contain unnecessary things and are also large), description of the series, the min and max intensity values of the series (of the magnitude, in case of complex-valued):
+Each dataset may (optionally) include the following attributes: series ID, DICOM header, description of the series, the min and max intensity values of the series (of the magnitude, in case of complex-valued):
 ```python
     seriesID, DICOMHeader, seriesDesc, min_val, max_val
 ```
-There should be one of each of these attributes (for group and dataset). If for some reason, there are multiple, then only the first one is taken, and a warning is logged for the same.
 
-As complex-valued data is created (explained later) by combining the magnitude and phase images, there will always be 2 of each - seriesID and DICOMHeader. Hence, within these two attributes, there will be "mag_0" and "phase_0", and the value of these keys will be the actual series ID and DICOM header. In the case of real-valued data, there will be only "mag_0". 
+For volumetric normalisation modes (e.g., `norm_type = divbymaxvol` or `norm_type = minmaxvol`), the `min_val` and `max_val` attributes are required.
 
-Moreover, there can be dimensional concatenation if specified by the stack_dim attribute inside the meta.yaml file. In that case, there will be even more series IDs, and DICOM headers need to be stored. Hence, they are stored as "mag_0" to "mag_n" (additionally, "phase_0" to "phase_n" for complex-valued data). 
-
-If an error is encountered while creating any group or dataset, that group is removed, and the error is logged.
-
-### DIXON Dataset (F20201)
-Neck-to-knee data was acquired using 6 different series. Those needed to be stitched to obtain the complete 3D volume, but they had different numbers of slices, contrast differences, etc. - making it difficult to combine them. The pipeline provided by the Research Centre for Optimal Health of the University of Westminster takes care of all these issues and does further analysis of the data (e.g. calculating fat and water percentages and finding bone joints). We have initially processed the UKBB provided zip files (6 series, 4 channels each - water, fat, in-phase, opposed-phase) using this pipeline (cf. https://github.com/recoh/pipeline) - referred to here as the RECOH pipeline, then created the HDF5 file using the different outputs of the pipeline. In each of the groups inside the HDF5 of this dataset, two additional attributes can be found: _n_DICOM_series_ (typically, 24) and _DICOMSeriesIDs_ (seriesIDs of the individual DICOMs). _n_series_ attributed in this case tells us whether multiple sets of acquisitions were performed. Each group contains 4 datasets and 2 more attributes - all these 6 things were obtained from the RECOH pipeline. The 4 datasets are: 
-```python
-    primary_WaterFat_i, primary_InOpp_i, auxiliary_WaterFatPercent_i, meta_mask_i
-```
-where _i_ denotes the acquisition number starting with 0. These datasets are 2-channel water-fat volumes, 2-channel in-phase opposed-phase volumes, 2-channel water-fat percentage (computed), and a 3D mask of the whole body (might be required as there is background noise in the images), respectively. Each dataset contains the same attributes as mentioned above, except for the two missing ones: _DICOMHeader_ and _seriesDesc_. Moreover, the 2 attributes obtained from the RECOH pipeline are:
-```python
-    meta_bone_joints_i, meta_RECOHPipe_i
-```
-containing JSON data - x-y-z coordinates of the bone joints and the metadata provided as a summary by the pipeline, respectively.
-
-### Complex-valued Data
-The dataset can be real-valued or complex-valued. The dataset contains individual magnitude and phase images, and the corresponding complex images are created using the following formula:
-```python
-complex_image = magnitude_data * (np.cos(phase_data) + 1j * np.sin(phase_data))
-```
-or rather, using the more computationally efficient expression:
-```python
-complex_image = magnitude_data * np.exp(1j * phase_data)
-```
-Whether a specific series is a magnitude or phase image is determined by the value of the DICOM header 0008|0008 - if it contains "ORIGINAL\\PRIMARY\\M" or "ORIGINAL\\PRIMARY\\P". While combining the magnitude and phase images, the 0020|0012 DICOM header of the magnitude and phase images are compared - to make sure the correct pairs are being combined.
-
-To fetch the magnitude and phase images, the following can be applied to the dataset:
-```python
-magnitude = abs(complex_image)
-phase = np.angle(complex_image)
-```
 
 ### Data Dimensions
-The dataset is 5D, having the following shape:
+The dataset must be 5D, with the following shape:
 ```python
-    Channel : Time : Slice : X : Y 
+Channel : Time : Slice : X : Y 
 ```
-Channel: Different MRIs from multi-echo or multi-TIeff MRI acquisitions will use this dimension to stack them, which will be referred to as "Channels". In the case of multi-contrast MRIs, this dimension can also be used - but only if they are co-registered. If there's only one, then the shape of this dim is 1.
-Time: For dynamic MRIs (and other dynamic acquisitions), the different time-points are to be concatenated in this dim. If only one TP, the shape of this dim is 1.
-Slice: For 3D MRIs, this dim will store the different slices. For 2D acquisitions, this dim will have a shape of 1.
-X and Y: The actual in-plane spatial dimensions.
+
+- **`Channel`:** This dimension is used to stack different MRIs from multi-echo or multi-TIeff MRI acquisitions, referred to as "Channels." In the case of multi-contrast MRIs, this dimension can also be used, but only if the images are co-registered. If there is only one channel, the shape of this dimension is `1`.
+- **`Time`:** For dynamic MRIs (and other dynamic acquisitions), the different time points should be concatenated along this dimension. If there is only one time point, the shape of this dimension is `1`.
+- **`Slice`:** For 3D MRIs, this dimension stores the different slices. For 2D acquisitions, the shape of this dimension will be `1`.
+- **`X` and `Y`:** These represent the in-plane spatial dimensions.
+
+For any other type of data, the dimensions can be reshaped to fit this structure (i.e., unnecessary dimensions can be set to have a shape of `1`).
+
+**Note:**
+In [this research](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/), the UK Biobank MRI ZIP files were processed using the script available at [https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS/blob/master/preprocess/createMRH5.py](https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS/blob/master/preprocess/createMRH5.py) to create the corresponding HDF5 file.
+
+## Trained Weights from Hugging Face
+The 3D DiffAE models trained on the CINE Cardiac Long Axis MRIs from UK Biobank as part of the research [Unsupervised cardiac MRI phenotyping with 3D diffusion autoencoders reveals novel genetic insights](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/) are available on [Hugging Face](https://huggingface.co/collections/soumickmj/cardiacdiffae-gwas-671b7595d09b0746b8fd0b72). 
+
+To use the weights (without this pipeline), you can directly load them using the Hugging Face Transformers library or you can use them with this library using by supplying the `--load_hf` argument to the main files. For example,
+```python
+    python Executors/main_diffAE.py --load_hf GlastonburyGroup/UKBBLatent_Cardiac_20208_DiffAE3D_L128_S1701
+```
+After loading, the model can further be trained (treating our weights as pretrained weights) or used for inference (following the instructions in the previous section, except the `--resume --load_best` flags).
+
+An [application]((https://huggingface.co/spaces/GlastonburyGroup/Live_UKBBLatent_Cardiac_20208_DiffAE3D_L128)) is also been hosted on [Hugging Face Spaces](https://huggingface.co/spaces/GlastonburyGroup/Live_UKBBLatent_Cardiac_20208_DiffAE3D_L128), where you can use your own MRIs to infer latent representations using the trained 3D DiffAE models. 
+
+
+## Citation
+If you find this work useful or utilise this pipeline (or any part of it) in your research, please consider citing us:
+```bibtex
+@article{Ometto2024.11.04.24316700,
+            author       = {Ometto, Sara and Chatterjee, Soumick and Vergani, Andrea Mario and Landini, Arianna and Sharapov, Sodbo and Giacopuzzi, Edoardo and Visconti, Alessia and Bianchi, Emanuele and Santonastaso, Federica and Soda, Emanuel M and Cisternino, Francesco and Ieva, Francesca and Di Angelantonio, Emanuele and Pirastu, Nicola and Glastonbury, Craig A},
+            title        = {Unsupervised cardiac MRI phenotyping with 3D diffusion autoencoders reveals novel genetic insights},
+            elocation-id = {2024.11.04.24316700},
+            year         = {2024},
+            doi          = {10.1101/2024.11.04.24316700},
+            publisher    = {Cold Spring Harbor Laboratory Press},
+            url          = {https://www.medrxiv.org/content/early/2024/11/05/2024.11.04.24316700},
+            journal      = {medRxiv}
+          }  
+```
+
+## Credits
+This pipeline is developed by [Dr Soumick Chatterjee](https://github.com/soumickmj) (as part of the [Glastonbury Group](https://humantechnopole.it/en/research-groups/glastonbury-group/), [Human Technopole, Milan, Italy](https://humantechnopole.it/en/)) based on the [NCC1701 pipeline](https://github.com/soumickmj/NCC1701) from the paper [*ReconResNet: Regularised residual learning for MR image reconstruction of Undersampled Cartesian and Radial data*](https://doi.org/10.1016/j.compbiomed.2022.105321). Special thanks to [Dr Domenico Iuso](https://github.com/snipdome) for collaborating on enhancing the NCC1701 and this pipeline with the latest PyTorch (and related) features, including DeepSpeed, and to [Rupali Khatun](https://github.com/rupaliasma) for her contributions to the pipeline with the complex-valued autoencoders.
+
+### DiffAE: Diffusion Autoencoder
+The 2D DiffAE model in this repository is based on the paper [*Diffusion Autoencoders: Toward a Meaningful and Decodable Representation*](https://diff-ae.github.io/). The repository adapts the code from the original [DiffAE repository](https://github.com/phizaz/diffae) to work with non-RGB images (e.g., MRIs) and extends it to 3D for processing volumetric images. 
+
+If you are using the DiffAE model from this repository, in addition to citing our paper mentioned above, please also cite the original paper:
+```bibtex
+@inproceedings{preechakul2021diffusion,
+      title={Diffusion Autoencoders: Toward a Meaningful and Decodable Representation}, 
+      author={Preechakul, Konpat and Chatthee, Nattanat and Wizadwongsa, Suttisak and Suwajanakorn, Supasorn},
+      booktitle={IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, 
+      year={2022},
+}
+```
+
+### pythae: Unifying Generative Autoencoders in Python
+For non-diffusion autoencoders (including VAEs), this pipeline utilises and extends (e.g. additional models, including complex-valued models) the [pythae](https://github.com/clementchadebec/benchmark_VAE) package. This package has been integrated into our pipeline, and to use models from this package, one must supply `0` as the `modelID`, the model name (from the list in the package's `__init__.py` file located inside `Engineering/Engines/WarpDrives/pythaeDrive`) as `pythae_model`, and the relative path (from `Engineering/Engines/WarpDrives/pythaeDrive/configs`) to the configuration JSON file for pythae as `pythae_config`. This is optional; if left blank, the default configuration will be used. 
+
+For example, for the Factor VAE's configuration file intended for the CelebA dataset, `originals/celeba/factor_vae_config.json` must be supplied. Default configurations can also be found in the same `__init__.py` file. The `__init__.py` file must be updated whenever a new model is added to the package or a new one is introduced. 
+
+The original configuration files (including the entire package) are intended for a few "toy" image datasets (binary_mnist, celeba, cifar10, dsprites, and mnist). Since CelebA is the most complex dataset among them, we have chosen those configurations as defaults. However, these configurations may need to be modified to suit our specific tasks.
+
+If you are using any of the non-diffusion autoencoder (including VAEs) models from this repository, in addition to citing our paper mentioned above, please also cite the original paper:
+```bibtex
+@inproceedings{chadebec2022pythae,
+        author = {Chadebec, Cl\'{e}ment and Vincent, Louis and Allassonniere, Stephanie},
+        booktitle = {Advances in Neural Information Processing Systems},
+        editor = {S. Koyejo and S. Mohamed and A. Agarwal and D. Belgrave and K. Cho and A. Oh},
+        pages = {21575--21589},
+        publisher = {Curran Associates, Inc.},
+        title = {Pythae: Unifying Generative Autoencoders in Python - A Benchmarking Use Case},
+        volume = {35},
+        year = {2022}
+}
+```
+
