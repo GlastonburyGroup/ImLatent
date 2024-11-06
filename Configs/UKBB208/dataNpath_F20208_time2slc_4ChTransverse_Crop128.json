@@ -1,0 +1,22 @@
+{
+    "run_prefix": "F20208_heart_1Ses_time2slc_MskCrop128",
+    "datadir": "../datasets/ukbbH5s/F20208_Long_axis_heart_images_DICOM_H5v1_LAX_4Ch_transverse_cropped_128_128",
+    "foldCSV": "5folds_1Ses_100DS_60Trn_10Val_30Tst_1701seed.csv",
+    "tblog_path": "../Out/TBLogs",
+    "save_path": "../Results",
+
+    "is_complexDS": false,
+
+    "DS_selected_primaries": ["LAX_4Ch_transverse"],
+
+    "DS_sanity_filters": {
+        "dim1": 50
+    },
+
+    "DS_multi_channel": false,
+    "DS_split_volume": false,
+    "DS_split_time": false,
+
+    "DS_channel_dim": 0,
+    "DS_slice_dim": 1
+}

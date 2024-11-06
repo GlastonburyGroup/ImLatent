@@ -1,0 +1,83 @@
+seed: 1701
+model:
+  latent_dim: 128 #set it to -1 or null to use the default value (in the case of pythae, it will be the value taken from the config file)
+  pythae:
+    n_features: 16
+    nn: "cvconvnet" #can be "convnet" (default) or "resnet" or for CV-versions: cvconvnet, cvresnet
+    reconstruction_loss: "crecon" #can be "mse" (default) or "l1" or "bce" or "custom"/"custom_masked" for custom_loss_class
+    # custom_loss_class: "Engineering.Science.losses.channel_weighted.ChannelVarWeightedLoss"
+    # custom_loss_params: {"loss_fn": "l1"} #can be "mse" (default) or "l1" or "bce" [While supplying a commandline argument, a string form of the dict can be supplied as it will be literal eval-ed] #TODO: make sure this is taken care of as the default functionaity is changing now
+    custom_loss_class: "Engineering.Science.losses.masked_loss.MaskedReconLoss"
+    custom_loss_params: {"loss_fn": "l1", "mode":"1"} #can be "mse" (default) or "l1" or "bce" [While supplying a commandline argument, a string form of the dict can be supplied as it will be literal eval-ed]
+    wrappers:
+      lstm:
+        im_encode_factor: 4
+        num_layers: 1
+        dropout: 0.1
+        bidirectional: true
+        connect_encdec: true
+        decode_last_hidden: true
+    models:
+      ultra_factor_vae:
+        anti_confounders_strategy: 0 # 0 Ignore, 1: Learn2ignore, 2: Neg-correlation
+        n_anti_confounder_layers: 2 #for strategy 1
+        lambda_conf_corr_loss: 1.0 #for strategy 2
+        learn_phenotypes: true
+        n_phenotype_layers: 2
+        lambda_phenotype_loss: 1.0
+      ultra_vae:
+        p_do: 0.0 #Probability of dropout in the internal layers (Will be ingored if set to 0.0 (default) or if only 1 layer is used)
+        anti_confounders_strategy: 0 # 0 Ignore, 1: Learn2ignore, 2: Neg-correlation
+        n_anti_confounder_layers: 2 #for strategy 1
+        lambda_conf_corr_loss: 1.0 #for strategy 2
+        learn_phenotypes: true
+        n_phenotype_layers: 2
+        lambda_phenotype_loss: 1.0
+      ultra_cevae:
+        ce_factor: 1.0 #StRegA uses 0.5
+        recon_factor: 1.0 #StRegA uses 1.0
+        vae_factor: 1.0 #StRegA uses 0.5 (but for better latent generation, this should be 1.0)
+        square_size_factor: 2 #StRegA uses 2: the square will be maximum half the size of the image
+        min_n_squares: 1 #If this is set to 0 (like the original StRegA), then the the sum of ce_factor and recon_factor should be 1.   max_n_squares: 3 #StRegA uses 3
+        anti_confounders_strategy: 0 # 0 Ignore, 1: Learn2ignore, 2: Neg-correlation
+        n_anti_confounder_layers: 2 #for strategy 1
+        lambda_conf_corr_loss: 1.0 #for strategy 2
+        learn_phenotypes: true
+        n_phenotype_layers: 2
+        lambda_phenotype_loss: 1.0
+training:
+  log_freq: 50 #Log every n-th step. Lightning default is 50. Flush will be twice this.
+  im_log_freq: 100 #For Tensorboard image logs, n_iteration. Set it to -1 if not desired
+  save_recon: True #Whether to save the recons during testing
+  LRDecay:
+    type1: #StepLR
+      decay_nepoch: 25
+      decay_rate: 0.1
+    type2: #ReduceLROnPlateau
+      decay_rate: 0.1
+      patience: 10
+      threshold: 0.0001
+      cooldown: 0
+      min_lr: 0
+  augmentations:
+    p: 0.0
+eval:
+  norm4diff: true #whether to apply normalisation before computing the difference images
+  store_fullscale_evals: false #whether to store SSIM Maps and difference images #TODO: think about how to handle fullscale evals (SSIM Maps and Difference Images). Store only for the selected recon save batches?
+  n_calc_processes: 8 #number of prallel processes to use for calculating the metrics. 0: use main process, -1: use all available CPU cores, >0: use the specified number of processes
+  metrics2use: #list of metrics to use for evaluation
+    ssim: true
+    msssim: false
+    nrmse: true
+    psnr: true
+    uqi: false
+    sddiff: false
+data:
+  dataset:
+    every_primary: false
+    include_repeatAcq: true
+    combine_acquisitions: false #TODO not implemented
+    data_mask_mode: 0 # 0: ignore mask, 1: use masked data only, 2: use masked recon loss [if "meta_mask" is available inside the data.h5, that will be used. If not, but meta_mask.h5 file is available in the same folder, that will be used. If neither, error will be raised.]
+    fetch_confounders: false
+    fetch_phenotypes: false
+  complex_mode: 0 # 0: complex image, 1: magnitude image, 2: real image, 3: channel-wise mag+phase [-3 to invert], 4: channel-wise real+imag [-4 to invert], 5: phase image, 6: imaginary image

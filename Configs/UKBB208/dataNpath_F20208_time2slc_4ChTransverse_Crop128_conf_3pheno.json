@@ -1,0 +1,34 @@
+{
+    "run_prefix": "F20208_heart_1Ses_t2s_MskCrp128_3ph",
+    "datadir": "/scratch/glastonbury/datasets/ukbbH5s/F20208_Long_axis_heart_images_DICOM_H5v1_LAX_4Ch_transverse_cropped_128_128",
+    "foldCSV": "5folds_1Ses_100DS_60Trn_10Val_30Tst_1701seed.csv",
+    "tblog_path": "/project/ukbblatent/Out/TBLogs",
+    "save_path": "/project/ukbblatent/Out/Results",
+
+    "DS_confounders": {
+        "path": "/group/glastonbury/sara/gwas/input/covariates_new_49k.tsv",
+        "cols": "Gender,Age,MRI_Date,BMI,MRI_Centre,BSA,MRI_Visit",
+        "bincat_cols": "Gender,MRI_Visit",
+        "mulcat_cols": "MRI_Date,MRI_Centre"
+    },
+
+    "DS_phenotypes": {
+        "path": "/group/glastonbury/sara/gwas/input/cardiac_pheno_35k.tsv",
+        "cols": "LV_endDiastolicVol,LV_endSystolicVol,LV_StrokeVol"
+    },
+
+    "is_complexDS": false,
+
+    "DS_selected_primaries": ["LAX_4Ch_transverse"],
+
+    "DS_sanity_filters": {
+        "dim1": 50
+    },
+
+    "DS_multi_channel": false,
+    "DS_split_volume": false,
+    "DS_split_time": false,
+
+    "DS_channel_dim": 0,
+    "DS_slice_dim": 1
+}

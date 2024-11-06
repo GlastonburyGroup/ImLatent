@@ -1,0 +1,53 @@
+seed: 1701
+model:
+  latent_dim: 10 #set it to -1 or null to use the default value (in the case of pythae, it will be the value taken from the config file)
+  pythae:
+    n_features: 64
+    nn: "convnet" #can be "convnet" (default) or "resnet" or for CV-versions: cvconvnet, cvresnet
+    reconstruction_loss: "mse" #can be "mse" (default) or "l1" or "bce" or "custom"/"custom_masked" for custom_loss_class
+    # custom_loss_class: "Engineering.Science.losses.channel_weighted.ChannelVarWeightedLoss"
+    # custom_loss_params: {"loss_fn": "l1"} #can be "mse" (default) or "l1" or "bce" [While supplying a commandline argument, a string form of the dict can be supplied as it will be literal eval-ed] #TODO: make sure this is taken care of as the default functionaity is changing now
+    custom_loss_class: "Engineering.Science.losses.masked_loss.MaskedReconLoss"
+    custom_loss_params: {"loss_fn": "l1", "mode":"1"} #can be "mse" (default) or "l1" or "bce" [While supplying a commandline argument, a string form of the dict can be supplied as it will be literal eval-ed]
+    wrappers:
+      lstm:
+        im_encode_factor: 4
+        num_layers: 1
+        dropout: 0.1
+        bidirectional: true
+        connect_encdec: true
+        decode_last_hidden: true
+training:
+  log_freq: 50 #Log every n-th step. Lightning default is 50. Flush will be twice this.
+  im_log_freq: 100 #For Tensorboard image logs, n_iteration. Set it to -1 if not desired
+  save_recon: True #Whether to save the recons during testing
+  LRDecay:
+    type1: #StepLR
+      decay_nepoch: 25
+      decay_rate: 0.1
+    type2: #ReduceLROnPlateau
+      decay_rate: 0.1
+      patience: 10
+      threshold: 0.0001
+      cooldown: 0
+      min_lr: 0
+  augmentations:
+    p: 0.0
+eval:
+  norm4diff: true #whether to apply normalisation before computing the difference images
+  store_fullscale_evals: false #whether to store SSIM Maps and difference images #TODO: think about how to handle fullscale evals (SSIM Maps and Difference Images). Store only for the selected recon save batches?
+  n_calc_processes: 8 #number of prallel processes to use for calculating the metrics. 0: use main process, -1: use all available CPU cores, >0: use the specified number of processes
+  metrics2use: #list of metrics to use for evaluation
+    ssim: true
+    msssim: false
+    nrmse: true
+    psnr: true
+    uqi: false
+    sddiff: false
+data:
+  dataset:
+    every_primary: true
+    include_repeatAcq: true
+    combine_acquisitions: false #TODO not implemented
+    data_mask_mode: 0 # 0: ignore mask, 1: use masked data only, 2: use masked recon loss [if "meta_mask" is available inside the data.h5, that will be used. If not, but meta_mask.h5 file is available in the same folder, that will be used. If neither, error will be raised.]
+  complex_mode: 1 # 0: complex image, 1: magnitude image, 2: real image, 3: channel-wise mag+phase [-3 to invert], 4: channel-wise real+imag [-4 to invert], 5: phase image, 6: imaginary image

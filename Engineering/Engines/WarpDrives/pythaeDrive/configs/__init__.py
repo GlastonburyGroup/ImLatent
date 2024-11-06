@@ -1,0 +1,1 @@
+# the sub-package originals contain the config files from the original repo's examples folder: https://github.com/clementchadebec/benchmark_VAE/tree/main/examples/scripts/configs
