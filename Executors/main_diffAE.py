@@ -48,6 +48,9 @@ def getARGSParser():
     parser.add_argument('--run_mode', action="store", default=4, type=int, help='0: Train, 1: Train and Validate, 2:Test, 3: Train followed by Test, 4: Train and Validate followed by Test')
     parser.add_argument('--dev_run', action="store", default=0, type=int, help='0: Train normally. 1 to n: runs only n training and n validation batch and the program ends. Set it to negative value to make it run in barebone mode.')
     parser.add_argument('--non_deter', action=argparse.BooleanOptionalAction, default=False, help="Whether to use non-deterministic algorithms or not. Usually, never!")
+
+    #Additional "basic" params
+    parser.add_argument('--fulltrainID', action="store", default="", help="If provided, the complete trainID won't be generated automatically, using the provided trainID. But, this value will be used exactly.")
     
     #This is following the original work of DiffAE. If any of the paramters (except for the prenorm) is modified, code of the DiffEngine needs to be modified accordingly
     parser.add_argument('--norm_type', action="store", default="zscore", help='Currently "zscore" normalisation and 2 (min-)max modes and their volumetric versions are supported. minmax, divbymax. Volumetric versions: minmaxvol, divbymaxvol')

@@ -82,24 +82,30 @@ class Engine(object):
 
         hparams.__dict__.update({'sys_params': sys_params})
 
-        hparams.trainID += f"fold{hparams.foldID}_prec{hparams.ampmode}" 
-        if hparams.taskID == 0:
-            hparams.trainID += (f"_model{hparams.modelID}" if hparams.modelID > 0 else f"_pythaemodel-{hparams.pythae_model}")
-        elif hparams.taskID == 1:
-            hparams.trainID += "_DiffAE"
-        elif hparams.taskID == 2:
-            hparams.trainID += "_LtCls"
-            hparams.parent_train_path = pjoin(hparams.save_path, hparams.parent_trainID)
-            hparams.save_path = pjoin(hparams.parent_train_path, "ClassifyLatent")
+        if "fulltrainID" in hparams and bool(hparams.fulltrainID):
+            logging.debug("Main Engine: fulltrainID, won't be generated automatically using the supplied trainID!")
+            hparams.trainID = hparams.fulltrainID
+            hparams.run_name = hparams.fulltrainID
+        else:
+            hparams.trainID += f"fold{hparams.foldID}_prec{hparams.ampmode}" 
+            if hparams.taskID == 0:
+                hparams.trainID += (f"_model{hparams.modelID}" if hparams.modelID > 0 else f"_pythaemodel-{hparams.pythae_model}")
+            elif hparams.taskID == 1:
+                hparams.trainID += "_DiffAE"
+            elif hparams.taskID == 2:
+                hparams.trainID += "_LtCls"
+                hparams.parent_train_path = pjoin(hparams.save_path, hparams.parent_trainID)
+                hparams.save_path = pjoin(hparams.parent_train_path, "ClassifyLatent")
 
-        if "interp_fact" in hparams and hparams.interp_fact != 1:
-            hparams.trainID += f"_interp{hparams.interp_fact}"
+            if "interp_fact" in hparams and hparams.interp_fact != 1:
+                hparams.trainID += f"_interp{hparams.interp_fact}"
 
-        hparams.run_name = (
-            f"{hparams.run_prefix}_{hparams.trainID}"
-            if bool(hparams.run_prefix)
-            else hparams.trainID
-        )
+            hparams.run_name = (
+                f"{hparams.run_prefix}_{hparams.trainID}"
+                if bool(hparams.run_prefix)
+                else hparams.trainID
+            )
+
         hparams.res_path = pjoin(
             hparams.save_path, hparams.run_name, f"Output"+(f"_{hparams.output_suffix}" if bool(hparams.output_suffix) else ""))
         os.makedirs(hparams.res_path, exist_ok=True)        
