@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 from functools import reduce
 from typing import Optional, Union
 import importlib.util
+import tempfile
 
 import torch
 from lightning.pytorch import Trainer, seed_everything
@@ -270,7 +271,7 @@ class Engine(object):
         self.hparams.IsNegLoss = IS_NEG_LOSS[self.hparams.lossID] 
         self.hparams.accumulate_gradbatch = self.hparams.effective_batch_size // self.hparams.batch_size
         if self.hparams.accumulate_gradbatch == 0:
-            self.hparams.accumulate_gradbatch = None
+            self.hparams.accumulate_gradbatch = 1
         self.amp = (self.hparams.ampmode != "32")
 
         self.hparams.do_val = self.hparams.run_mode in [1, 4]
@@ -331,9 +332,15 @@ class Engine(object):
         if self.hparams.run_mode == 2 and bool(self.chkpoint):
             # TODO (from NCC1701) ckpt_path is not working during testing if not trained in the same run. So loading explicitly. check why
             logging.debug("Main Engine: Loading existing checkpoint... [Hugging Face model (if loaded) will be ignored]")
-            self.model.load_state_dict(
-                torch.load(self.chkpoint)['state_dict'])
-                
+            state_dict = torch.load(self.chkpoint)
+            if self.hparams.taskID == 1 and state_dict['state_dict']['x_T'].shape != self.model.x_T.shape:
+                logging.debug("Main Engine (DiffAE): Input shape mismatch between the trained model and the current model. Ignoring the buffer while loading the weights...")
+                state_dict['state_dict']['x_T'] = self.model.x_T                
+                with tempfile.NamedTemporaryFile(suffix='.ckpt', delete=False) as temp_file:
+                    torch.save(state_dict, temp_file.name)    
+                    self.chkpoint = temp_file.name         
+            self.model.load_state_dict(state_dict['state_dict'])
+                            
         self.model.lr = self.hparams.lr #This is required for the Auto LR finder to work
 
         loggers = []
@@ -416,13 +423,13 @@ class Engine(object):
         tuner = Tuner(self.trainer)
         
         if self.hparams.auto_bs:
-            tuner.scale_batch_size(self.model, mode="binsearch")
+            tuner.scale_batch_size(self.model, mode="binsearch", datamodule=self.datamodule)
                         
             # The tune method updated the batch size param inside the data module, so we need to update the hparams and trainer accordingly (not neccesary, but cleaner). Updating accumulate_grad_batches is required
             self.hparams.batch_size = self.datamodule.batch_size
             self.hparams.accumulate_gradbatch = self.hparams.effective_batch_size // self.datamodule.batch_size
             if self.hparams.accumulate_gradbatch == 0: #If it's 0, it means that the batch size is bigger than the effective batch size, so we set it to None (the default value)
-                self.hparams.accumulate_gradbatch = None
+                self.hparams.accumulate_gradbatch = 1
             self.trainer.accumulate_grad_batches = self.hparams.accumulate_gradbatch
             logging.debug(f"Main Engine: Auto Batch Size found and set the batch_size to be: {self.hparams.batch_size}")
             
