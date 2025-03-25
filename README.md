@@ -1,6 +1,6 @@
 # Unsupervised latent representation learning using 2D and 3D diffusion and other autoencoders
 
-This repository provides a pipeline for training and evaluating 2D and 3D diffusion autoencoders, traditional autoencoders, and various variational autoencoders for unsupervised latent representation learning from 2D and 3D images, primarily focusing on MRIs. This repository was developed as part of the paper titled [Unsupervised cardiac MRI phenotyping with 3D diffusion autoencders reveals novel genetic insights](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/) and was utilised to learn and infer latent representations from cardiac MRIs (CINE) using a 3D diffusion autoencoder.
+This repository provides a pipeline for training and evaluating 2D and 3D diffusion autoencoders, traditional autoencoders, and various variational autoencoders for unsupervised latent representation learning from 2D and 3D images, primarily focusing on MRIs. This repository was developed as part of the paper titled [Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/) and was utilised to learn and infer latent representations from cardiac MRIs (CINE) using a 3D diffusion autoencoder.
 
   - [Pipeline](#pipeline)
     - [Structure](#structure)
@@ -124,7 +124,7 @@ For any other type of data, the dimensions can be reshaped to fit this structure
 In [this research](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/), the UK Biobank MRI ZIP files were processed using the script available at [https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS/blob/master/preprocess/createH5s/createH5_MR_DICOM.py](https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS/blob/master/preprocess/createH5s/createH5_MR_DICOM.py) to create the corresponding HDF5 file.
 
 ## Trained Weights from Hugging Face
-The 3D DiffAE models trained on the CINE Cardiac Long Axis MRIs from UK Biobank as part of the research [Unsupervised cardiac MRI phenotyping with 3D diffusion autoencoders reveals novel genetic insights](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/) are available on [Hugging Face](https://huggingface.co/collections/soumickmj/cardiacdiffae-gwas-671b7595d09b0746b8fd0b72). 
+The 3D DiffAE models trained on the CINE Cardiac Long Axis MRIs from UK Biobank as part of the research [Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/) are available on [Hugging Face](https://huggingface.co/collections/soumickmj/cardiacdiffae-gwas-671b7595d09b0746b8fd0b72). 
 
 To use the weights (without this pipeline), you can directly load them using the Hugging Face Transformers library or you can use them with this library using by supplying the `--load_hf` argument to the main files. For example,
 ```python
@@ -139,8 +139,8 @@ An [application]((https://huggingface.co/spaces/GlastonburyGroup/Live_UKBBLatent
 If you find this work useful or utilise this pipeline (or any part of it) in your research, please consider citing us:
 ```bibtex
 @article{Ometto2024.11.04.24316700,
-            author       = {Ometto, Sara and Chatterjee, Soumick and Vergani, Andrea Mario and Landini, Arianna and Sharapov, Sodbo and Giacopuzzi, Edoardo and Visconti, Alessia and Bianchi, Emanuele and Santonastaso, Federica and Soda, Emanuel M and Cisternino, Francesco and Ieva, Francesca and Di Angelantonio, Emanuele and Pirastu, Nicola and Glastonbury, Craig A},
-            title        = {Unsupervised cardiac MRI phenotyping with 3D diffusion autoencoders reveals novel genetic insights},
+            author       = {Ometto, Sara and Chatterjee, Soumick and Vergani, Andrea Mario and Landini, Arianna and Sharapov, Sodbo and Giacopuzzi, Edoardo and Visconti, Alessia and Bianchi, Emanuele and Santonastaso, Federica and Soda, Emanuel M and Cisternino, Francesco and Pivato, Carlo Andrea and Ieva, Francesca and Di Angelantonio, Emanuele and Pirastu, Nicola and Glastonbury, Craig A},
+            title        = {Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture},
             elocation-id = {2024.11.04.24316700},
             year         = {2024},
             doi          = {10.1101/2024.11.04.24316700},
