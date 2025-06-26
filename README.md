@@ -2,13 +2,14 @@
 
 This repository provides a pipeline for training and evaluating 2D and 3D diffusion autoencoders, traditional autoencoders, and various variational autoencoders for unsupervised latent representation learning from 2D and 3D images, primarily focusing on MRIs. This repository was developed as part of the paper titled [Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/) and was utilised to learn and infer latent representations from cardiac MRIs (CINE) using a 3D diffusion autoencoder.
 
+- [Unsupervised latent representation learning using 2D and 3D diffusion and other autoencoders](#unsupervised-latent-representation-learning-using-2d-and-3d-diffusion-and-other-autoencoders)
   - [Pipeline](#pipeline)
     - [Structure](#structure)
     - [Executing the pipeline](#executing-the-pipeline)
       - [Running inference on a trained model](#running-inference-on-a-trained-model)
   - [Dataset](#dataset)
     - [Data Dimensions](#data-dimensions)
-  - [Trained Weights from Hugging Face](#weights-from-hugging-face)
+  - [Trained Weights from Hugging Face](#trained-weights-from-hugging-face)
   - [Citation](#citation)
   - [Credits](#credits)
     - [DiffAE: Diffusion Autoencoder](#diffae-diffusion-autoencoder)
@@ -39,10 +40,16 @@ Currently, three distinct main files are available:
 
 A conda environment can be created using the provided `environment.yml` file. 
 
-To execute, the call should be from the root directly of the pipeline. For example:
+To execute, the call should be from the root directory of the pipeline. For example:
 ```python
     python Executors/main_recon.py --batch_size 32 --lr 0.0001 --training§LRDecay§type1§decay_rate 0.15 --training§prova testing --json§save_path /myres/toysets/Results
 ```
+
+Instead of create a conda environment, [Poetry](https://python-poetry.org/) can also be used. Once Poetry is installed, this pipeline can be launched from its root directory without installing any dependencies manually or using the yml file by adding `poetry run` before calling calling python. For example:
+```python
+    poetry run python Executors/main_recon.py --batch_size 32 --lr 0.0001 --training§LRDecay§type1§decay_rate 0.15 --training§prova testing --json§save_path /myres/toysets/Results
+```
+
 Here, _main_recon.py_ is the main file that is to be executed, _batch_size_ and _lr_ are arguments which will be replacing the default values for those parameters supplied within that main file, _training§LRDecay§type1§decay_rate_ and _training§prova_ (arguments not specified inside the main file or any of the Engines) are going to override the values present inside the config.yaml file mentioned inside the main file (or supplied as a command line argument) - following the path splitting the key with dollars, and finally, _json§save_path_ (same as the earlier one, but arguments starting with _json§_) will override the _save_path_ value of the parameter inside the _dataNpath.json_ specified inside the main file (or supplied as a command line argument).
 
 Please note:  

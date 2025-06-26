@@ -30,13 +30,9 @@ from lightning.pytorch.tuner import Tuner
 from transformers import AutoModel
 
 from .AuxiliaryEngines.ReconEngine import ReconEngine
-
-with contextlib.suppress(Exception):
-    from .AuxiliaryEngines.DiffAEEngine import DiffAEEngine
-    
-with contextlib.suppress(Exception):
-    from .AuxiliaryEngines.ClassifyLatentEngine import ClassifyLatentEngine
-    from ..data.latent_datamodule import LatentDataModule
+from .AuxiliaryEngines.DiffAEEngine import DiffAEEngine
+from .AuxiliaryEngines.ClassifyLatentEngine import ClassifyLatentEngine
+from ..data.latent_datamodule import LatentDataModule
     
 from ..data.datamodule import UKBBImgDataModule
 from ..Science.losses import IS_NEG_LOSS

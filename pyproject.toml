@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "imlatent"
+version = "0.1.0"
+description = "This repository provides a pipeline for training and evaluating 2D and 3D diffusion autoencoders, traditional autoencoders, and various variational autoencoders for unsupervised latent representation learning from 2D and 3D images, primarily focusing on MRIs. This repository was developed as part of the paper titled Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture and was utilised to learn and infer latent representations from cardiac MRIs (CINE) using a 3D diffusion autoencoder."
+authors = ["soumick.chatterjee <soumick.chatterjee@fht.org>"]
+license = "Apache-2.0 license"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+h5py = "^3.14.0"
+pandas = "^2.3.0"
+scikit-learn = "^1.7.0"
+zarr = "^3.0.8"
+torch = {version = "^2.7.1+cu118", source = "pytorch"}
+torchvision = {version = "^0.22.1+cu118", source = "pytorch"}
+torchaudio = {version = "^2.7.1+cu118", source = "pytorch"}
+lightning = "^2.5.2"
+torchio = "^0.20.14"
+pytorch-msssim = "^1.0.0"
+deepspeed = "^0.17.1"
+pyssim = "^0.7.1"
+dataclasses = "0.6"
+pythae = "0.1.1"
+pydantic = "^2.11.7"
+transformers = "^4.52.4"
+latte = "^4.0"
+scikit-image = "^0.25.2"
+pytorch-complex = "^0.2.0"
+async-timeout = "^5.0.1"
+sewar = "^0.4.6"
+numpy = "^2.3.1"
+
+
+[[tool.poetry.source]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu118"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
