@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
 import torch
-from numpy.lib.function_base import flip
+from numpy import flip
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import *
 from torch import nn
