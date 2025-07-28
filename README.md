@@ -45,10 +45,11 @@ To execute, the call should be from the root directory of the pipeline. For exam
     python Executors/main_recon.py --batch_size 32 --lr 0.0001 --training§LRDecay§type1§decay_rate 0.15 --training§prova testing --json§save_path /myres/toysets/Results
 ```
 
-Instead of create a conda environment, [Poetry](https://python-poetry.org/) can also be used. Once Poetry is installed, this pipeline can be launched from its root directory without installing any dependencies manually or using the yml file by adding `poetry run` before calling calling python. For example:
+Instead of create a conda environment, [Poetry](https://python-poetry.org/) can also be used. . Once Poetry is installed, this pipeline can be launched from its root directory without manually installing any dependencies manually or using the yml file by adding `poetry run` before calling python. For example:
 ```python
     poetry run python Executors/main_recon.py --batch_size 32 --lr 0.0001 --training§LRDecay§type1§decay_rate 0.15 --training§prova testing --json§save_path /myres/toysets/Results
 ```
+For continuous access in the terminal without adding the `poetry run` prefix to all commands, `poetry shell` (It must be installed additionally: https://github.com/python-poetry/poetry-plugin-shell.git) can be executed to activate the environment. The other Python commands can then be executed normally.
 
 Here, _main_recon.py_ is the main file that is to be executed, _batch_size_ and _lr_ are arguments which will be replacing the default values for those parameters supplied within that main file, _training§LRDecay§type1§decay_rate_ and _training§prova_ (arguments not specified inside the main file or any of the Engines) are going to override the values present inside the config.yaml file mentioned inside the main file (or supplied as a command line argument) - following the path splitting the key with dollars, and finally, _json§save_path_ (same as the earlier one, but arguments starting with _json§_) will override the _save_path_ value of the parameter inside the _dataNpath.json_ specified inside the main file (or supplied as a command line argument).
 
