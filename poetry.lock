@@ -1765,6 +1765,24 @@ docs = ["requests (>=2.0.0)"]
 typing = ["mypy (>=1.0.0)", "types-setuptools"]
 
 [[package]]
+name = "lpips"
+version = "0.1.4"
+description = "LPIPS Similarity metric"
+optional = false
+python-versions = "*"
+files = [
+    {file = "lpips-0.1.4-py3-none-any.whl", hash = "sha256:fd537af5828b69d2e6ffc0a397bd506dbc28ca183543617690844c08e102ec5e"},
+    {file = "lpips-0.1.4.tar.gz", hash = "sha256:3846331df6c69688aec3d300a5eeef6c529435bc8460bd58201c3d62e56188fa"},
+]
+
+[package.dependencies]
+numpy = ">=1.14.3"
+scipy = ">=1.0.1"
+torch = ">=0.4.0"
+torchvision = ">=0.2.1"
+tqdm = ">=4.28.1"
+
+[[package]]
 name = "markdown"
 version = "3.8.2"
 description = "Python implementation of John Gruber's Markdown."
@@ -3215,6 +3233,27 @@ files = [
 torch = ">=2.7.1,<3.0.0"
 torchaudio = ">=2.7.1,<3.0.0"
 torchvision = ">=0.22.1,<0.23.0"
+
+[[package]]
+name = "pytorch-fid"
+version = "0.3.0"
+description = "Package for calculating Frechet Inception Distance (FID) using PyTorch"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "pytorch-fid-0.3.0.tar.gz", hash = "sha256:1c80d112c9cf5ebcbcc428a0b7ea615c302805ad6780ec29e8e2955ba31571c8"},
+    {file = "pytorch_fid-0.3.0-py3-none-any.whl", hash = "sha256:0e1d4fe66441a8dff2a2aca31394e9389fb197dfeff046f2f971f271d4137767"},
+]
+
+[package.dependencies]
+numpy = "*"
+pillow = "*"
+scipy = "*"
+torch = ">=1.0.1"
+torchvision = ">=0.2.2"
+
+[package.extras]
+dev = ["flake8", "flake8-bugbear", "flake8-isort", "nox"]
 
 [[package]]
 name = "pytorch-lightning"
@@ -4938,4 +4977,4 @@ test = ["coverage", "hypothesis", "mypy", "packaging", "pytest (<8.4)", "pytest-
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "6c841713e5acd351bc62e7d91f2c2bf43f1021353b0ba20ab0fd3b173742b49c"
+content-hash = "ff8eae0d333cf7438a56b4c163cda03923ab1f6c9ebc80e265859f5e899791d7"
