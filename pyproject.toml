@@ -30,6 +30,11 @@ pytorch-complex = "^0.2.0"
 async-timeout = "^5.0.1"
 sewar = "^0.4.6"
 numpy = "^2.3.1"
+ipykernel = "^6.30.0"
+matplotlib = "^3.10.3"
+wandb = "^0.21.0"
+tensorboard = "^2.20.0"
+tokenizers = "<0.21.4"
 
 
 [[tool.poetry.source]]
