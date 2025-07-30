@@ -75,7 +75,7 @@ class SpacedDiffusionBeatGans(GaussianDiffusionBeatGans):
     """
     def __init__(self, conf: SpacedDiffusionBeatGansConfig):
         self.conf = conf
-        self.use_timesteps = set(conf.use_timesteps)
+        self.use_timesteps = list(conf.use_timesteps)
         # how the new t's mapped to the old t's
         self.timestep_map = []
         self.original_num_steps = len(conf.betas)

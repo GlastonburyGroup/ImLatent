@@ -96,7 +96,7 @@ def getARGSParser():
     parser.add_argument('--preweights_path', action="store", default="", help="Checkpoint path for pre-loading weights before starting the pipeline (Can be used for transfer learning)")
     parser.add_argument('--is3D', action="store", default=0, type=int, help="Is it a 3D model?")
     parser.add_argument('--in_channels', action="store", default=128, type=int, help="Number of input embeddings")
-    parser.add_argument('--complie_model', action=argparse.BooleanOptionalAction, default=False, help="Apply torch.compile on the model for speed-up (requires PyTorch 2.0+)")
+    parser.add_argument('--compile_model', action=argparse.BooleanOptionalAction, default=False, help="Apply torch.compile on the model for speed-up (requires PyTorch 2.0+)")
     parser.add_argument('--check_anomalies', action=argparse.BooleanOptionalAction, default=False, help="Check for anomalies, like nan loss during training (Disable for speedup)")
 
     #Model tunes with lightning

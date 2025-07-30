@@ -208,7 +208,7 @@ def getSSIM(gt, out, gt_flag=None, data_range=1):
             )
             for j in range(gt.shape[1])
         )
-    return median(vals)
+    return float(median(vals)) if vals else 0.0
 
 def pearson_correlation(x, y):
     mean_x = np.mean(x)

@@ -106,7 +106,7 @@ def getARGSParser():
     parser.add_argument('--is3D', action="store", default=1, type=int, help="Is it a 3D model?")
     parser.add_argument('--in_channels', action="store", default=1, type=int, help="Number of input channels")
     parser.add_argument('--out_channels', action="store", default=1, type=int, help="Number of input channels (Should be identical to in_channels, but still possible to change)")
-    parser.add_argument('--complie_model', action=argparse.BooleanOptionalAction, default=False, help="Apply torch.compile on the model for speed-up (requires PyTorch 2.0+)")
+    parser.add_argument('--compile_model', action=argparse.BooleanOptionalAction, default=False, help="Apply torch.compile on the model for speed-up (requires PyTorch 2.0+)")
     parser.add_argument('--check_anomalies', action=argparse.BooleanOptionalAction, default=False, help="Check for anomalies, like nan loss during training (Disable for speedup)")
 
     #Model tunes with lightning

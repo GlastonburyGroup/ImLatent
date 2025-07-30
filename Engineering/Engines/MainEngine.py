@@ -151,8 +151,6 @@ class Engine(object):
         insane = True
         if self.hparams.lr_decay_type == 1: # To be resolved from Lightning
             logging.error("Main Engine: StepLR (lr_decay_type=1) is throwing a weird error from Lighning! Avoid it ultil resolved!")        
-        elif self.hparams.complie_model: # To be resolved from Lightning or PyTorch, I'm not sure yet
-            logging.error("Main Engine: Compile is throwing a weird error! Avoid it ultil resolved!")  
         elif self.hparams.lr_decay_type != 0:
             logging.error("Main Engine: Currently, lr_decay is not yet supported! Avoid it ultil resolved!")
         else:
@@ -354,9 +352,9 @@ class Engine(object):
             loggers.append(TensorBoardLogger(self.hparams.tblog_path,
                            name=self.hparams.run_name, log_graph=False))
 
-        if self.hparams.complie_model:
+        if self.hparams.compile_model:
             self.model = torch.compile(self.model)
-
+            
         checkpoint_callback = ModelCheckpoint(
             dirpath=pjoin(self.hparams.save_path,
                           self.hparams.run_name, "Checkpoints"),
