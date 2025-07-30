@@ -14,7 +14,9 @@ from numpy import flip
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import *
 from torch import nn
-# from torch.cuda import amp
+from torch.amp import autocast
+
+
 from torch.distributions import Categorical
 from torch.optim.optimizer import Optimizer
 from torchvision import transforms
@@ -177,7 +179,7 @@ class DiffAEEngine(ReconEngine):
         return out['sample']
 
     def forward(self, x_start=None, noise=None, ema_model: bool = False):
-        with amp.autocast(False):
+        with autocast(device_type=self.device.type, enabled=False):
             model = self.ema_net if ema_model else self.net
             return self.eval_sampler.sample(
                 model=model,
@@ -310,7 +312,7 @@ class DiffAEEngine(ReconEngine):
         given an input, calculate the loss function
         no optimization at this stage.
         """
-        with amp.autocast(False):
+        with autocast(device_type=self.device.type, enabled=False):
             # forward
             if self.conf.train_mode.require_dataset_infer():
                 # this mode as pre-calculated cond
@@ -499,7 +501,7 @@ class DiffAEEngine(ReconEngine):
                             cond = model.noise_to_cond(cond)
                         else:
                             if interpolate:
-                                with amp.autocast(self.conf.fp16):
+                                with autocast(device_type=self.device.type, enabled=self.conf.fp16):
                                     cond = model.encoder(_xstart)
                                     i = torch.randperm(len(cond))
                                     cond = (cond + cond[i]) / 2
