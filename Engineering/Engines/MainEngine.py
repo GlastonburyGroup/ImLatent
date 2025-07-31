@@ -22,7 +22,7 @@ import tempfile
 
 import torch
 from lightning.pytorch import Trainer, seed_everything
-from lightning.pytorch.callbacks import ModelCheckpoint
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
 from torch import optim
 from torchvision import transforms as tvTransforms
@@ -354,13 +354,19 @@ class Engine(object):
 
         if self.hparams.compile_model:
             self.model = torch.compile(self.model)
-            
-        checkpoint_callback = ModelCheckpoint(
+
+        callbacks = [ModelCheckpoint(
             dirpath=pjoin(self.hparams.save_path,
                           self.hparams.run_name, "Checkpoints"),
             monitor='val_loss',
             save_last=True,
-        )
+        )]
+
+        if self.hparams.early_stopping_patience != -1:
+            logging.debug("Main Engine: Early stopping is enabled, with patience: "+str(self.hparams.early_stopping_patience))
+            callbacks.append(
+                EarlyStopping(monitor='val_loss', patience=self.hparams.early_stopping_patience, mode='min', check_on_train_epoch_end=False)
+            )
 
         try:
             precision = int(self.hparams.ampmode)
@@ -369,7 +375,7 @@ class Engine(object):
             
         trainer_params = {
             "accelerator": self.hparams.accelerator,
-            "callbacks": [checkpoint_callback],
+            "callbacks": callbacks,
             "check_val_every_n_epoch": 1 if self.hparams.do_val else self.hparams.num_epochs+1,
             "detect_anomaly": self.hparams.check_anomalies,
             "deterministic": not self.hparams.non_deter,

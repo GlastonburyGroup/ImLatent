@@ -84,6 +84,7 @@ def getARGSParser():
     parser.add_argument('--grad_clip_algo', action="store", default="norm", help="Which gradient clipping algorithm to use: value or norm. Leave it blank if not desired")
     parser.add_argument('--grad_clip_val', action="store", default=1, type=float, help="The value to clip the gradients to, using the specified algo. Only used if grad_clip_algo is not blank")
     parser.add_argument('--lr_decay_type', action="store", default=0, type=int, help='0: No Decay, 1: StepLR, 2: ReduceLROnPlateau')
+    parser.add_argument('--early_stopping_patience', action="store", default=-1, type=int, help='Number of epochs to wait before stopping the training. Set it to -1 to disable early stopping')
     parser.add_argument('--interp_fact', type=float, default=1, help="If not set to 1, the input will be interpolated to the given factor before sending it to the CropOrPad function (if enabled)")
     parser.add_argument('--input_shape', action="store", default="50,128,128", help="length, width, depth (to be used if patch_size is not given)")
     parser.add_argument('--croppad', action=argparse.BooleanOptionalAction, default=True, help="If True, then it will crop or pad the volume/slice to the given input_shape")
