@@ -13,6 +13,7 @@ The snapshot of this codebase at the time of acceptance is archived on Zenodo: [
 - [Unsupervised latent representation learning using 2D and 3D diffusion and other autoencoders](#unsupervised-latent-representation-learning-using-2d-and-3d-diffusion-and-other-autoencoders)
   - [Pipeline](#pipeline)
     - [Structure](#structure)
+    - [Environment setup](#environment-setup)
     - [Executing the pipeline](#executing-the-pipeline)
       - [Running inference on a trained model](#running-inference-on-a-trained-model)
   - [Dataset](#dataset)
@@ -45,20 +46,31 @@ Currently, three distinct main files are available:
 **Inside the *Engineering* package,** all the files related to the actual implementation of the pipeline are stored.
 
 
+### Environment setup
+
+This pipeline uses [uv](https://docs.astral.sh/uv/) for dependency and environment management. The dependency set is declared in `pyproject.toml` and pinned in `uv.lock`, so every install reproduces the same versions.
+
+After [installing uv](https://docs.astral.sh/uv/getting-started/installation/), run the following from the root directory of the pipeline:
+```bash
+uv sync
+```
+This creates a `.venv` in the project root, installs the dependencies exactly as pinned in `uv.lock`, and installs the `Engineering` and `Executors` packages in editable mode. Python itself is provisioned by uv, so no pre-existing interpreter is required. The pipeline requires Python >= 3.11 and < 3.13.
+
+**A note on CUDA:** `torch`, `torchvision`, and `torchaudio` are installed from PyPI, whose wheels bundle the CUDA 12.x runtime libraries, so no system-wide CUDA toolkit is needed for them. However, `mamba-ssm` and `causal-conv1d` ship no pre-built wheels and are compiled from source during `uv sync`, which does require a matching `nvcc` on the system and takes a considerable amount of time on the first install. To use a PyTorch build for a different CUDA version, add the corresponding index to `pyproject.toml` (see the [uv PyTorch guide](https://docs.astral.sh/uv/guides/integration/pytorch/)) and re-run `uv lock`.
+
+**Legacy environments:** earlier versions of this pipeline were installed with conda (`environment.yml`) or [Poetry](https://python-poetry.org/) (`_poetry/`). Both are retained for reference only and are no longer maintained — they pin considerably older versions of PyTorch and its dependencies, and they omit the more recently added packages. uv is the only supported way to set up this pipeline.
+
 ### Executing the pipeline
 
-A conda environment can be created using the provided `environment.yml` file.
-
-To execute, the call should be made from the root directory of the pipeline. For example:
+To execute, the call should be made from the root directory of the pipeline, prefixed with `uv run`. For example:
 ```bash
-python Executors/main_recon.py --batch_size 32 --lr 0.0001 --training§LRDecay§type1§decay_rate 0.15 --training§prova testing --json§save_path /myres/toysets/Results
+uv run python Executors/main_recon.py --batch_size 32 --lr 0.0001 --training§LRDecay§type1§decay_rate 0.15 --training§prova testing --json§save_path /myres/toysets/Results
 ```
-
-[Poetry](https://python-poetry.org/) can be used instead of a conda environment. Once Poetry is installed, this pipeline can be launched from its root directory without manually installing any dependencies (or using the yml file) by prefixing the command with `poetry run`. For example:
+`uv run` verifies that the environment matches `uv.lock` before each run, re-syncing it if anything has drifted. For continuous use without prefixing every command with `uv run`, the environment can be activated directly:
 ```bash
-poetry run python Executors/main_recon.py --batch_size 32 --lr 0.0001 --training§LRDecay§type1§decay_rate 0.15 --training§prova testing --json§save_path /myres/toysets/Results
+source .venv/bin/activate
 ```
-For continuous use without prefixing every command with `poetry run`, `poetry shell` (which must be installed separately: https://github.com/python-poetry/poetry-plugin-shell.git) can be executed to activate the environment, after which Python commands can be run normally.
+after which Python commands can be run normally.
 
 In the example above, `main_recon.py` is the script being executed. `batch_size` and `lr` override the default values for those parameters defined inside the main file. `training§LRDecay§type1§decay_rate` and `training§prova` (arguments not declared in the main file or any of the Engines) override the corresponding values inside the config.yaml file specified by the main file (or supplied as a command-line argument), with the key split on the `§` delimiter to traverse the nested dictionary. Finally, `json§save_path` (any argument starting with `json§`) overrides the corresponding key inside the `dataNpath.json` specified by the main file (or supplied as a command-line argument).
 
@@ -67,7 +79,7 @@ A note on behaviour: `training§LRDecay§type1§decay_rate` will look up the dic
 
 For the complete list of command-line arguments, please refer to the main files or run the main file with the `--help` flag, e.g.:
 ```bash
-python Executors/main_diffAE.py --help
+uv run python Executors/main_diffAE.py --help
 ```
 and check the files inside the *Configs* folder.
 
@@ -145,7 +157,7 @@ The 3D DiffAE models trained on the CINE Cardiac Long Axis MRIs from UK Biobank 
 
 The weights can be loaded directly using the Hugging Face Transformers library (without this pipeline), or used with this pipeline by supplying the `--load_hf` argument to the main files. For example:
 ```bash
-python Executors/main_diffAE.py --load_hf GlastonburyGroup/UKBBLatent_Cardiac_20208_DiffAE3D_L128_S1701
+uv run python Executors/main_diffAE.py --load_hf GlastonburyGroup/UKBBLatent_Cardiac_20208_DiffAE3D_L128_S1701
 ```
 Once loaded, the model can be trained further (treating our weights as pretrained) or used for inference (following the instructions in the previous section, except the `--resume --load_best` flags).
 
