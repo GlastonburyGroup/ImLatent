@@ -1,12 +1,12 @@
 # Unsupervised latent representation learning using 2D and 3D diffusion and other autoencoders
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20204053.svg)](https://doi.org/10.5281/zenodo.20204053)
-[![Preprint](https://img.shields.io/badge/medRxiv-2024.11.04.24316700-b31b1b.svg)](https://doi.org/10.1101/2024.11.04.24316700)
+[![Paper](https://img.shields.io/badge/Nat%20Commun-10.1038%2Fs41467--026--74575--y-b31b1b.svg)](https://doi.org/10.1038/s41467-026-74575-y)
 [![Project page](https://img.shields.io/badge/Project-page-blue.svg)](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/)
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow.svg)](https://huggingface.co/collections/soumickmj/cardiacdiffae-gwas-671b7595d09b0746b8fd0b72)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-This repository provides a pipeline for training and evaluating 2D and 3D diffusion autoencoders, traditional autoencoders, and various variational autoencoders for unsupervised latent representation learning from 2D and 3D images, primarily focusing on MRIs. It is the deep learning pipeline used in the paper [*Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture*](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/) (accepted in *Nature Communications*; preprint at [medRxiv](https://doi.org/10.1101/2024.11.04.24316700)), in which it was used to learn and infer latent representations from cardiac CINE MRIs with a 3D diffusion autoencoder. Note that this repository contains only the DL pipeline; the full set of scripts accompanying the paper (preprocessing, GWAS, downstream analyses) lives separately under the same [GitHub organisation](https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS).
+This repository provides a pipeline for training and evaluating 2D and 3D diffusion autoencoders, traditional autoencoders, and various variational autoencoders for unsupervised latent representation learning from 2D and 3D images, primarily focusing on MRIs. It is the deep learning pipeline used in the paper [*Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture*](https://doi.org/10.1038/s41467-026-74575-y), published in *Nature Communications* ([project page](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/)), in which it was used to learn and infer latent representations from cardiac CINE MRIs with a 3D diffusion autoencoder. Note that this repository contains only the DL pipeline; the full set of scripts accompanying the paper (preprocessing, GWAS, downstream analyses) lives separately under the same [GitHub organisation](https://github.com/GlastonburyGroup/CardiacDiffAE_GWAS).
 
 The snapshot of this codebase at the time of acceptance is archived on Zenodo: [10.5281/zenodo.20204053](https://doi.org/10.5281/zenodo.20204053).
 
@@ -166,22 +166,23 @@ An [interactive application](https://huggingface.co/spaces/GlastonburyGroup/Live
 ## Citation
 If you use this pipeline (or any part of it) in your research, please cite the paper:
 
-> Ometto, S.\*, Chatterjee, S.\*, Vergani, A. M., Landini, A., Sharapov, S., Giacopuzzi, E., Visconti, A., Bianchi, E., Santonastaso, F., Soda, E. M., Cisternino, F., Pivato, C. A., Ieva, F., Di Angelantonio, E., Pirastu, N., Glastonbury, C. A. *Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture*. **Nature Communications** (in press, 2026). Preprint: [medRxiv 2024.11.04.24316700](https://doi.org/10.1101/2024.11.04.24316700).
+> **Ometto, S.**\*, **Chatterjee, S.**\*, Vergani, A. M., Landini, A., Sharapov, S., Giacopuzzi, E., Visconti, A., Bianchi, E., Santonastaso, F., Soda, E. M., Cisternino, F., Pivato, C. A., Ieva, F., Di Angelantonio, E., Pirastu, N., Glastonbury, C. A. *Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture*. **Nature Communications** **17**, 8517 (2026). [https://doi.org/10.1038/s41467-026-74575-y](https://doi.org/10.1038/s41467-026-74575-y)
 >
-> \*Joint first authors.
+> \*Sara Ometto and Soumick Chatterjee are joint first authors, having contributed equally to this work.
 
-BibTeX (preprint version; will be updated once the journal version is online):
+BibTeX:
 ```bibtex
-@article{Ometto2024.11.04.24316700,
-    author       = {Ometto, Sara and Chatterjee, Soumick and Vergani, Andrea Mario and Landini, Arianna and Sharapov, Sodbo and Giacopuzzi, Edoardo and Visconti, Alessia and Bianchi, Emanuele and Santonastaso, Federica and Soda, Emanuel M and Cisternino, Francesco and Pivato, Carlo Andrea and Ieva, Francesca and Di Angelantonio, Emanuele and Pirastu, Nicola and Glastonbury, Craig A},
-    title        = {Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture},
-    elocation-id = {2024.11.04.24316700},
-    year         = {2024},
-    doi          = {10.1101/2024.11.04.24316700},
-    publisher    = {Cold Spring Harbor Laboratory Press},
-    url          = {https://www.medrxiv.org/content/early/2024/11/05/2024.11.04.24316700},
-    journal      = {medRxiv},
-    note         = {Ometto and Chatterjee contributed equally. Accepted at Nature Communications.}
+@article{ometto2026hundreds,
+    author    = {Ometto, Sara and Chatterjee, Soumick and Vergani, Andrea Mario and Landini, Arianna and Sharapov, Sodbo and Giacopuzzi, Edoardo and Visconti, Alessia and Bianchi, Emanuele and Santonastaso, Federica and Soda, Emanuel M and Cisternino, Francesco and Pivato, Carlo Andrea and Ieva, Francesca and Di Angelantonio, Emanuele and Pirastu, Nicola and Glastonbury, Craig A},
+    title     = {Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture},
+    journal   = {Nature Communications},
+    volume    = {17},
+    pages     = {8517},
+    year      = {2026},
+    publisher = {Nature Publishing Group UK London},
+    doi       = {10.1038/s41467-026-74575-y},
+    url       = {https://doi.org/10.1038/s41467-026-74575-y},
+    note      = {Ometto and Chatterjee contributed equally.}
 }
 ```
 
