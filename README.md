@@ -1,6 +1,5 @@
 # Unsupervised latent representation learning using 2D and 3D diffusion and other autoencoders
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20204053.svg)](https://doi.org/10.5281/zenodo.20204053)
 [![Paper](https://img.shields.io/badge/Nat%20Commun-10.1038%2Fs41467--026--74575--y-b31b1b.svg)](https://doi.org/10.1038/s41467-026-74575-y)
 [![Project page](https://img.shields.io/badge/Project-page-blue.svg)](https://glastonburygroup.github.io/CardiacDiffAE_GWAS/)
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow.svg)](https://huggingface.co/collections/soumickmj/cardiacdiffae-gwas-671b7595d09b0746b8fd0b72)
@@ -54,11 +53,19 @@ After [installing uv](https://docs.astral.sh/uv/getting-started/installation/), 
 ```bash
 uv sync
 ```
-This creates a `.venv` in the project root, installs the dependencies exactly as pinned in `uv.lock`, and installs the `Engineering` and `Executors` packages in editable mode. Python itself is provisioned by uv, so no pre-existing interpreter is required. The pipeline requires Python >= 3.11 and < 3.13.
+This creates a `.venv` in the project root, installs the dependencies exactly as pinned in `uv.lock`, and installs the `Engineering` and `Executors` packages in editable mode. Python itself is provisioned by uv, so no pre-existing interpreter is required. The pipeline requires Python >= 3.11 and < 3.15 (developed and tested on 3.14).
 
-**A note on CUDA:** `torch`, `torchvision`, and `torchaudio` are installed from PyPI, whose wheels bundle the CUDA 12.x runtime libraries, so no system-wide CUDA toolkit is needed for them. However, `mamba-ssm` and `causal-conv1d` ship no pre-built wheels and are compiled from source during `uv sync`, which does require a matching `nvcc` on the system and takes a considerable amount of time on the first install. To use a PyTorch build for a different CUDA version, add the corresponding index to `pyproject.toml` (see the [uv PyTorch guide](https://docs.astral.sh/uv/guides/integration/pytorch/)) and re-run `uv lock`.
+**A note on CUDA:** `torch` and `torchvision` are installed from PyPI, whose wheels bundle the CUDA 12.x runtime libraries, so no system-wide CUDA toolkit is needed for them. To use a PyTorch build for a different CUDA version, add the corresponding index to `pyproject.toml` (see the [uv PyTorch guide](https://docs.astral.sh/uv/guides/integration/pytorch/)) and re-run `uv lock`.
 
-**Legacy environments:** earlier versions of this pipeline were installed with conda (`environment.yml`) or [Poetry](https://python-poetry.org/) (`_poetry/`). Both are retained for reference only and are no longer maintained — they pin considerably older versions of PyTorch and its dependencies, and they omit the more recently added packages. uv is the only supported way to set up this pipeline.
+**Optional Mamba support:** `mamba-ssm` and `causal-conv1d` are *not* installed by default; they live in the `mamba` extra:
+
+```bash   # a matching nvcc and a modern GCC are required
+uv sync --extra mamba
+```
+
+Neither package publishes wheels for Python 3.13 or newer, so both are compiled from source on this Python; expect roughly 20 minutes on first install. Their `setup.py` hardcodes a gencode floor of `compute_75` and emits no PTX, so the resulting kernels **do not run on Volta (V100, `sm_70`)** — they require Turing (`sm_75`) or newer. On an unsupported GPU the import succeeds but any kernel launch fails with `CUDA error: no kernel image is available for execution on the device`.
+
+**Legacy environments:** earlier versions of this pipeline were installed with conda (`environment.yml`) and [Poetry](https://python-poetry.org/). Conda is retained for reference only (while Poetry has been dropped completely) and are no longer maintained — they pin considerably older versions of PyTorch and its dependencies, and they omit the more recently added packages. uv is the only supported way to set up this pipeline.
 
 ### Executing the pipeline
 

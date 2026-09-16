@@ -7,7 +7,7 @@ name = "imlatent"
 version = "0.1.0"
 description = "This repository provides a pipeline for training and evaluating 2D and 3D diffusion autoencoders, traditional autoencoders, and various variational autoencoders for unsupervised latent representation learning from 2D and 3D images, primarily focusing on MRIs. This repository was developed as part of the paper titled Hundreds of cardiac MRI traits derived using 3D diffusion autoencoders share a common genetic architecture and was utilised to learn and infer latent representations from cardiac MRIs (CINE) using a 3D diffusion autoencoder."
 readme = "README.md"
-requires-python = ">=3.11, <3.13"
+requires-python = ">=3.11, <3.15"
 license = { text = "Apache-2.0 license" }
 authors = [
   { name = "soumick.chatterjee", email = "soumick.chatterjee@fht.org" }
@@ -19,18 +19,17 @@ dependencies = [
     "pandas>=2.3.0,<3.0.0",
     "scikit-learn>=1.7.0,<2.0.0",
     "zarr>=3.0.8,<4.0.0",
-    "torch>=2.9.1,<3.0.0",
-    "torchvision>=0.24.0,<0.25.0",
-    "torchaudio>=2.9.1,<3.0.0",
+    "torch>=2.10.0,<2.11.0",
+    "torchvision>=0.25.0,<0.26.0",
     "lightning>=2.5.2,<3.0.0",
     "torchio>=0.20.14,<0.21.0",
     "pytorch-msssim>=1.0.0,<2.0.0",
-    "deepspeed>=0.17.1,<0.18.0",
+    "deepspeed>=0.18.9,<0.20.0",
     "pyssim>=0.7.1,<0.8.0",
     "pythae==0.1.1",
     "transformers>=4.52.4,<5.0.0",
-    "latte>=4.0.0,<5.0.0",
-    "scikit-image>=0.25.2,<0.26.0",
+    "latte-metrics[pytorch]>=0.0.1a6",
+    "scikit-image>=0.26.0,<0.27.0",
     "pytorch-complex>=0.2.0,<0.3.0",
     "async-timeout>=5.0.1,<6.0.0",
     "sewar>=0.4.6,<0.5.0",
@@ -46,9 +45,18 @@ dependencies = [
     "fvcore>=0.1.5.post20221221,<0.2.0",
     "monai>=1.5.1,<2.0.0",
     "batchgenerators>=0.25.1,<0.26.0",
-    "torchinfo>=1.8.0,<2.0.0",
-    "mamba-ssm[causal-conv1d]>=2.3.0",
+    "torchinfo>=1.8.0,<2.0.0"
 ]
+
+[project.optional-dependencies]
+mamba = ["mamba-ssm[causal-conv1d]>=2.3.0"]
+
+[tool.uv]
+constraint-dependencies = ["torchaudio==2.10.0"]
+
+[tool.uv.extra-build-dependencies]
+mamba-ssm     = [{ requirement = "torch", match-runtime = true }]
+causal-conv1d = [{ requirement = "torch", match-runtime = true }]
 
 [tool.hatch.build.targets.wheel]
 packages = ["Engineering", "Executors"]  # the actual importable packages in this repo

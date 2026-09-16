@@ -129,6 +129,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+old.venv/
 
 # Spyder project settings
 .spyderproject
@@ -163,3 +164,4 @@ cython_debug/
 *.DS_Store
 wandb/*
 _poetry/*
+uv.oldlock
