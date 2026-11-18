@@ -1,0 +1,19 @@
+{
+    "run_prefix": "F20254v3_Liver_ROICrop96x96_onlySpleen",
+    "datadir": "../datasets/ukbbH5s/F20254_Liver_imaging_IDEAL_protocol_DICOM_H5v3_ftSAM_spleen_Spleen_cropped_96_96_onlyROI",
+    "foldCSV": "5folds_1Ses_100DS_75Trn_10Val_15Tst_1701seed.csv",
+    "tblog_path": "../Out/TBLogs",
+    "save_path": "../Results",
+    "is_complexDS": true,
+    "DS_path_tag": "Tra",
+    "DS_selected_primaries": [
+        "primary"
+    ],
+    "DS_selected_auxiliaries": null,
+    "DS_sanity_filters": {
+        "dim0": 6
+    },
+    "DS_multi_channel": true,
+    "DS_split_volume": false,
+    "DS_split_time": false
+}

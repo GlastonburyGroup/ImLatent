@@ -15,7 +15,8 @@ class UKBBImgH5(Dataset):
                         channel_dim=0, slice_dim=2, data_mask_mode=0, #Params to make any dim as the channel and slice.
                         fetch_phenotypes=False, phenotypes=None, #Params to fetch phenotypes
                         fetch_confounders=False, confounders=None, #Params to fetch confounders
-                        squeeze_slice=True): #param to decide whether to squeeze the obtained slice or not
+                        squeeze_slice=True, #param to decide whether to squeeze the obtained slice or not
+                        toyrun=0, path_tag=""): # toyrun=0 would be for normal execution, any other number would mean it will be a toyrun and only that many samples will be read. path_tag (optional) is prefixed to the name of the processed DSPaths cache file
         self.h5_file = h5_file
         self.transform = transform
         self.fetchMinMax = fetchMinMax
@@ -101,15 +102,23 @@ class UKBBImgH5(Dataset):
         if sanity_filters is not None:
             self.search_criteria['sanity_filters'] = sanity_filters
 
-        processed_name = f"DSPaths{'_mulChan' if multi_channel else ''}{'_splitVol' if split_volume else ''}{'_splitTime' if split_time else ''}"
+        toyrun = int(toyrun) if bool(toyrun) else 0
+        processed_name = f"DSPaths_{path_tag}" if bool(path_tag) else "DSPaths"
+        processed_name = f"{processed_name}{'_mulChan' if multi_channel else ''}{'_splitVol' if split_volume else ''}{'_splitTime' if split_time else ''}"
         md5_patients = hashlib.md5(json.dumps(self.search_criteria, sort_keys=True).encode('utf-8')).hexdigest()
         sha_patients = hashlib.sha3_256(json.dumps(self.search_criteria, sort_keys=True).encode('utf-8')).hexdigest()
         processed_path = h5_file.replace(".h5", f"_processedmeta/{processed_name}_MD5{md5_patients}_SHA3{sha_patients}.json")
-        if os.path.exists(processed_path):
-            with open(processed_path, 'r') as f:
-                self.DSPaths = json.load(f)
-        else:    
+        self.DSPaths = []
+        try:
+            if os.path.exists(processed_path):
+                with open(processed_path, 'r') as f:
+                    self.DSPaths = json.load(f)
+        except Exception: #corrupt/partial cache file: rebuild it below
+            logging.warning(f"UKBBImgH5: Unable to read the processed DSPaths file {processed_path}, it will be recreated.")
             self.DSPaths = []
+
+        if len(self.DSPaths) == 0:
+            self.sample_counter = 0
             def get_paths(name, obj):
                 name_parts = name.split('/')
                 #TODO: replace the current search with regex-based search
@@ -147,11 +156,19 @@ class UKBBImgH5(Dataset):
                                     for i in (range(1) if multi_channel or obj_shape[0] == 1 else range(obj_shape[0]))
                                     for j in (range(1) if not split_time or obj_shape[1] == 1 else range(obj_shape[1]))
                                     for k in (range(1) if not split_volume or obj_shape[2] == 1 else range(obj_shape[2]))]
+                    self.sample_counter += 1
+
+                    if toyrun > 0 and self.sample_counter >= toyrun:
+                        return True #returning a non-None value stops h5py's visititems
 
             h5_init.visititems(get_paths)
-            os.makedirs(os.path.dirname(processed_path), exist_ok=True)
-            with open(processed_path, 'w') as f:
-                json.dump(self.DSPaths, f)
+
+            if toyrun > 0:
+                logging.warning(f"UKBBImgH5: Toyrun mode is on (toyrun is greater than 0). Only {len(self.DSPaths)} samples will be read and won't be saved for future use.")
+            else:
+                os.makedirs(os.path.dirname(processed_path), exist_ok=True)
+                with open(processed_path, 'w') as f:
+                    json.dump(self.DSPaths, f)
 
         if data_mask_mode: #if data_mask_mode is not 0, then we need to fetch the mask - either from the data.h5 or meta_mask.h5
             key, _ = self.DSPaths[0]

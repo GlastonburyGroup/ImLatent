@@ -110,7 +110,7 @@ class UKBBImgDataModule(pl.LightningDataModule):
 
     def train_dataloader(self) -> DataLoader:
         if not self.use_concurrent_dataloader:
-            return DataLoader(self.trainDS, shuffle=True, batch_size=self.batch_size, pin_memory=True, drop_last=True, num_workers=self.num_workers, prefetch_factor=self.data_prefetch)
+            return DataLoader(self.trainDS, shuffle=True, batch_size=self.batch_size, pin_memory=True, drop_last=False, num_workers=self.num_workers, prefetch_factor=self.data_prefetch)
         dl = DataLoaderParallel(dataset=self.trainDS,
                                 batch_size=self.batch_size,
                                 num_workers=self.num_workers//2, 
@@ -127,7 +127,7 @@ class UKBBImgDataModule(pl.LightningDataModule):
 
     def val_dataloader(self) -> DataLoader:        
         if not self.use_concurrent_dataloader:
-            return DataLoader(self.valDS, shuffle=True, batch_size=self.batch_size, pin_memory=True, drop_last=True, num_workers=self.num_workers, prefetch_factor=self.data_prefetch)
+            return DataLoader(self.valDS, shuffle=True, batch_size=self.batch_size, pin_memory=True, drop_last=False, num_workers=self.num_workers, prefetch_factor=self.data_prefetch)
         dl = DataLoaderParallel(dataset=self.valDS,
                                 batch_size=self.batch_size,
                                 num_workers=self.num_workers//2, 

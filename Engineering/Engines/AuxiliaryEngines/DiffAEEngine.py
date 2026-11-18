@@ -458,7 +458,15 @@ class DiffAEEngine(ReconEngine):
     def predict_step(self, batch, batch_idx):
         emb = self.encode(batch['inp']['data']).detach().cpu()
         return emb.numpy() if emb.dtype not in {torch.bfloat16, torch.float16} else emb.to(dtype=torch.float32).numpy()
-    
+
+    @staticmethod
+    def _make_sample_grid(x):
+        # x: (n, c, h, w). 1- or 3-channel images are shown as they are; any other number of channels
+        # (e.g. 7 ShMoLLI fit-params or 6 IDEAL channels) is shown as one greyscale tile per channel, one row per sample.
+        if x.shape[1] in [1, 3]:
+            return make_grid(x)
+        return make_grid(x.reshape(-1, 1, *x.shape[2:]), nrow=x.shape[1])
+
     def log_sample(self, x_start, batch_idx):
         """
         put images to the tensorboard
@@ -542,12 +550,12 @@ class DiffAEEngine(ReconEngine):
                         real = real.flatten(0, 1)
 
                     if self.global_rank == 0:
-                        grid_real = (make_grid(real) + 1) / 2
+                        grid_real = (self._make_sample_grid(real) + 1) / 2
                         self.loggers[-1].experiment.add_image(f'sample{postfix}/real', grid_real, batch_idx)
 
                 if self.global_rank == 0:
                     # save samples to the tensorboard
-                    grid = (make_grid(gen) + 1) / 2
+                    grid_gen = (self._make_sample_grid(gen) + 1) / 2
                     # sample_dir = os.path.join(self.conf.logdir,
                     #                           f'sample{postfix}')
                     # if not os.path.exists(sample_dir):
@@ -555,7 +563,7 @@ class DiffAEEngine(ReconEngine):
                     # path = os.path.join(sample_dir,
                     #                     '%d.png' % batch_idx)
                     # save_image(grid, path)
-                    self.loggers[-1].experiment.add_image(f'sample{postfix}/generated', grid, batch_idx)
+                    self.loggers[-1].experiment.add_image(f'sample{postfix}/generated', grid_gen, batch_idx)
             model.train()
 
         if self.hparams.tbactive and self.conf.sample_every_batches > 0 and batch_idx % self.conf.sample_every_batches == 0:

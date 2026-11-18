@@ -1,0 +1,19 @@
+{
+    "run_prefix": "F20259v3_Pancreas_FITPARAMS_ROICrop192x320_onlyKidney",
+    "datadir": "../datasets/ukbbH5s/F20259_Pancreas_Images_ShMoLLI_DICOM_H5v3_ftSAM_kidney_Kidney_cropped_192_320_onlyROI",
+    "foldCSV": "5folds_1Ses_100DS_75Trn_10Val_15Tst_1701seed.csv",
+    "tblog_path": "../Out/TBLogs",
+    "save_path": "../Results",
+    "is_complexDS": false,
+    "DS_path_tag": "FITPARAMS",
+    "DS_selected_primaries": null,
+    "DS_selected_auxiliaries": [
+        "auxiliary_FITPARAMS"
+    ],
+    "DS_sanity_filters": {
+        "dim0": 7
+    },
+    "DS_multi_channel": true,
+    "DS_split_volume": false,
+    "DS_split_time": false
+}

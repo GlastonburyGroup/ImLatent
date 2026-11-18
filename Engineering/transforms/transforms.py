@@ -60,7 +60,7 @@ class SuperTransformer():
             for k in sample.keys():
                 if (type(sample[k]) is not dict) or ("data" not in sample[k]) or (bool(self.include) and k not in self.include) or (not bool(self.include) and bool(self.exclude) and k in self.exclude):
                     continue
-                if (isinstance(self, IntensityNorm) and "volmax" in sample[k]) or (isinstance(self, ZScoreNorm) and isinstance(self.pnorm, IntensityNorm) and "volmax" in sample[k]):
+                if (isinstance(self, IntensityNorm) and "volmax" in sample[k]) or (isinstance(self, ZScoreNorm) and self._uses_vol_prenorm() and "volmax" in sample[k]):
                     out = self.apply(sample[k]['data'], volminmax=(sample[k]["volmin"], sample[k]["volmax"]))
                 else:
                     out = self.apply(sample[k]['data'])
@@ -221,6 +221,11 @@ class ZScoreNorm(SuperTransformer):
         else:
             self.pnorm = nn.Identity()
             
+    def _uses_vol_prenorm(self):
+        # True when ZScoreNorm uses its own min-max/divbymax pnorm (i.e. a string prenorm such as "minmaxvol") or an IntensityNorm,
+        # in which case the volume-wise min/max (volmin/volmax) must be supplied to pnorm. False for no prenorm or a float prenorm.
+        return getattr(self, "prenorm_type", None) is not None or isinstance(getattr(self, "pnorm", None), IntensityNorm)
+
     def pnorm(self, inp, volminmax=None):
         if volminmax is None:
             vmin = inp.min()

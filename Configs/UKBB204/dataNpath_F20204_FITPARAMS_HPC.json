@@ -1,0 +1,19 @@
+{
+    "run_prefix": "F20204v3_Liver_FITPARAMS",
+    "datadir": "../datasets/ukbbH5s/F20204_Liver_Imaging_T1_ShMoLLI_DICOM_H5v3",
+    "foldCSV": "5folds_1Ses_primary_0_100DS_75Trn_10Val_15Tst_1701seed.csv",
+    "tblog_path": "../Out/TBLogs",
+    "save_path": "../Results",
+    "is_complexDS": false,
+    "DS_path_tag": "FITPARAMS",
+    "DS_selected_primaries": null,
+    "DS_selected_auxiliaries": [
+        "auxiliary_FITPARAMS"
+    ],
+    "DS_sanity_filters": {
+        "dim0": 7
+    },
+    "DS_multi_channel": true,
+    "DS_split_volume": false,
+    "DS_split_time": false
+}
